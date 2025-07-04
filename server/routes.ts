@@ -31,12 +31,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/mood-entries/range", async (req, res) => {
     try {
-      const { startDate, endDate } = req.query;
+      const { startDate, endDate, userId } = req.query;
       if (!startDate || !endDate) {
         return res.status(400).json({ error: "Start date and end date are required" });
       }
       
+      const userIdNum = userId ? parseInt(userId as string) : 1; // Default to guest user
       const entries = await storage.getMoodEntriesByDateRange(
+        userIdNum,
         new Date(startDate as string),
         new Date(endDate as string)
       );
@@ -88,8 +90,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Daily goals API
   app.get("/api/daily-goals", async (req, res) => {
     try {
-      const date = req.query.date ? new Date(req.query.date as string) : undefined;
-      const goals = await storage.getDailyGoals(date);
+      const { date, userId } = req.query;
+      const targetDate = date ? new Date(date as string) : undefined;
+      const userIdNum = userId ? parseInt(userId as string) : 1; // Default to guest user
+      const goals = await storage.getDailyGoals(userIdNum, targetDate);
       res.json(goals);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch daily goals" });
@@ -129,7 +133,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User preferences API
   app.get("/api/preferences", async (req, res) => {
     try {
-      const preferences = await storage.getUserPreferences();
+      const { userId } = req.query;
+      const userIdNum = userId ? parseInt(userId as string) : 1; // Default to guest user
+      const preferences = await storage.getUserPreferences(userIdNum);
       res.json(preferences);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch user preferences" });
@@ -138,8 +144,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/preferences", async (req, res) => {
     try {
+      const { userId } = req.query;
+      const userIdNum = userId ? parseInt(userId as string) : 1; // Default to guest user
       const data = insertUserPreferencesSchema.partial().parse(req.body);
-      const preferences = await storage.updateUserPreferences(data);
+      const preferences = await storage.updateUserPreferences(userIdNum, data);
       res.json(preferences);
     } catch (error) {
       if (error instanceof z.ZodError) {
