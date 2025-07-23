@@ -3,6 +3,7 @@ import { formatTime } from "@/lib/utils";
 import { useWeather } from "@/hooks/useWeather";
 import { getMoodEmoji, getMoodLabel } from "@/lib/utils";
 import type { MoodType } from "@/types";
+import { Link } from "wouter";
 
 interface HeaderProps {
   currentMood: MoodType;
@@ -30,7 +31,7 @@ export default function Header({ currentMood }: HeaderProps) {
             <span>{formatTime(currentTime)}</span>
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           {/* Weather Widget */}
           <div className="flex items-center space-x-2 bg-white/20 rounded-full px-4 py-2">
@@ -39,20 +40,39 @@ export default function Header({ currentMood }: HeaderProps) {
             ) : (
               <>
                 <span className="weather-icon text-yellow-300">
-                  {weather?.condition === "sunny" ? "☀️" : 
-                   weather?.condition === "cloudy" ? "☁️" : 
-                   weather?.condition === "rainy" ? "🌧️" : "☁️"}
+                  {weather?.condition === "sunny"
+                    ? "☀️"
+                    : weather?.condition === "cloudy"
+                    ? "☁️"
+                    : weather?.condition === "rainy"
+                    ? "🌧️"
+                    : "☁️"}
                 </span>
-                <span className="text-white font-medium">{weather?.temperature}°C</span>
+                <span className="text-white font-medium">
+                  {weather?.temperature}°C
+                </span>
                 <span className="text-white/80 text-sm">{weather?.city}</span>
               </>
             )}
           </div>
-          
+
           {/* Current Mood Indicator */}
           <div className="flex items-center space-x-2 bg-white/20 rounded-full px-4 py-2">
             <span className="text-lg">{getMoodEmoji(currentMood)}</span>
-            <span className="text-white font-medium">{getMoodLabel(currentMood)}</span>
+            <span className="text-white font-medium">
+              {getMoodLabel(currentMood)}
+            </span>
+          </div>
+
+          {/* Auth Buttons */}
+          <div className="flex items-center space-x-2 ml-4">
+            <Link href="/login" className="text-white hover:underline">
+              Se connecter
+            </Link>
+            <span className="text-white/60">|</span>
+            <Link href="/register" className="text-white hover:underline">
+              S’inscrire
+            </Link>
           </div>
         </div>
       </div>

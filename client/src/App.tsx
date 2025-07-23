@@ -3,13 +3,18 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+
 import Home from "@/pages/Home";
 import NotFound from "@/pages/not-found";
+import Login from "@/pages/Login";     // ou "login" si le fichier s'appelle login.tsx
+import Register from "@/pages/Register";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );
