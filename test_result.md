@@ -107,63 +107,78 @@ user_problem_statement: "Créer une application EmotionalCompanion avec un compa
 backend:
   - task: "OpenAI Integration with EmergentIntegrations"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Integrated OpenAI GPT-4o using emergentintegrations library with emotional system messages based on mood and intensity. API key configured in .env file."
+      - working: false
+        agent: "testing"
+        comment: "CRITICAL: OpenAI API key has exceeded quota. Error: 'You exceeded your current quota, please check your plan and billing details.' All AI response generation endpoints (/api/ai-response and /api/chat) return HTTP 500. This blocks the core functionality of the emotional companion app."
 
   - task: "User Management API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Created user creation and retrieval endpoints with MongoDB storage using UUID for user IDs."
+      - working: true
+        agent: "testing"
+        comment: "✅ WORKING: User creation (/api/users POST) and retrieval (/api/users/{user_id} GET) endpoints working perfectly. UUID format validated, MongoDB persistence confirmed. Test user 'Marie Dubois' created with UUID: 0ea805f1-fbfe-405d-8f42-d16fdb63b562."
 
   - task: "Mood Logging System"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented mood entry logging with mood type and intensity (1-10 scale) stored in MongoDB."
+      - working: true
+        agent: "testing"
+        comment: "✅ WORKING: Mood logging (/api/mood POST) and retrieval (/api/mood/{user_id} GET) working perfectly. Tested all 9 moods (happy, sad, anxious, calm, excited, angry, tired, confused, proud) with various intensities (1-10). MongoDB persistence confirmed, UUID format validated."
 
   - task: "AI Response Generation"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Created endpoint that generates contextual AI responses based on user mood and intensity using specialized system messages for each emotional state."
+      - working: false
+        agent: "testing"
+        comment: "❌ BLOCKED: Same OpenAI quota issue as above. The /api/ai-response endpoint implementation is correct but fails due to OpenAI API quota exceeded. System messages for emotional states are properly configured in French."
 
   - task: "Chat System with Session Management"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented chat system with session IDs for conversation continuity, storing chat history in MongoDB with mood context."
+      - working: false
+        agent: "testing"
+        comment: "❌ BLOCKED: Chat endpoints (/api/chat POST and /api/chat/{session_id} GET) fail due to same OpenAI quota issue. Session management and MongoDB storage implementation appears correct but cannot be fully validated without working OpenAI API."
 
 frontend:
   - task: "User Registration Interface"
