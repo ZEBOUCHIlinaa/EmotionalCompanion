@@ -217,28 +217,37 @@ async def get_user_moods(user_id: str, limit: int = 10):
 
 @api_router.post("/ai-response", response_model=AIResponse)
 async def get_ai_response(request: AIResponseRequest):
-    """Get AI response based on user's mood"""
+    """Get AI response based on user's mood - with fallback for OpenAI quota issues"""
     try:
-        # Create system message based on mood
-        system_message = get_emotional_system_message(request.mood, request.intensity)
-        
-        # Initialize LLM chat
-        chat = LlmChat(
-            api_key=OPENAI_API_KEY,
-            session_id=f"mood-{request.user_id}-{datetime.utcnow().timestamp()}",
-            system_message=system_message
-        ).with_model("openai", "gpt-4o").with_max_tokens(200)
-        
-        # Prepare user message
-        if request.message:
-            user_text = f"Je me sens {request.mood} (intensité: {request.intensity}/10). {request.message}"
+        # Try OpenAI integration first
+        if OPENAI_API_KEY:
+            try:
+                # Create system message based on mood
+                system_message = get_emotional_system_message(request.mood, request.intensity)
+                
+                # Initialize LLM chat
+                chat = LlmChat(
+                    api_key=OPENAI_API_KEY,
+                    session_id=f"mood-{request.user_id}-{datetime.utcnow().timestamp()}",
+                    system_message=system_message
+                ).with_model("openai", "gpt-4o").with_max_tokens(200)
+                
+                # Prepare user message
+                if request.message:
+                    user_text = f"Je me sens {request.mood} (intensité: {request.intensity}/10). {request.message}"
+                else:
+                    user_text = f"Je me sens {request.mood} avec une intensité de {request.intensity}/10. Peux-tu m'aider ?"
+                
+                user_message = UserMessage(text=user_text)
+                ai_response_text = await chat.send_message(user_message)
+                
+            except Exception as openai_error:
+                # Fallback to intelligent mock responses if OpenAI fails
+                logging.warning(f"OpenAI error, using fallback: {str(openai_error)}")
+                ai_response_text = get_fallback_emotional_response(request.mood, request.intensity, request.message)
         else:
-            user_text = f"Je me sens {request.mood} avec une intensité de {request.intensity}/10. Peux-tu m'aider ?"
-        
-        user_message = UserMessage(text=user_text)
-        
-        # Get AI response
-        ai_response_text = await chat.send_message(user_message)
+            # Use fallback if no API key
+            ai_response_text = get_fallback_emotional_response(request.mood, request.intensity, request.message)
         
         # Save to database
         ai_response = AIResponse(
