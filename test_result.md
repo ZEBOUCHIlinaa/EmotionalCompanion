@@ -262,11 +262,12 @@ metadata:
 test_plan:
   current_focus:
     - "OpenAI Integration with EmergentIntegrations"
-    - "User Management API"
-    - "Mood Logging System"
     - "AI Response Generation"
     - "Chat System with Session Management"
-  stuck_tasks: []
+  stuck_tasks:
+    - "OpenAI Integration with EmergentIntegrations"
+    - "AI Response Generation"
+    - "Chat System with Session Management"
   test_all: false
   test_priority: "high_first"
 
