@@ -109,6 +109,81 @@ def get_emotional_system_message(mood: str, intensity: int):
     
     return base_message + intensity_guidance + " Réponds toujours en français avec chaleur et authenticité. Limite tes réponses à 2-3 phrases maximum pour rester accessible."
 
+def get_fallback_emotional_response(mood: str, intensity: int, message: Optional[str] = None):
+    """Generate intelligent fallback responses when OpenAI is unavailable"""
+    
+    fallback_responses = {
+        "sad": [
+            "Je comprends que tu traverses un moment difficile. Rappelle-toi que ces sentiments sont temporaires et que tu as la force de les surmonter.",
+            "Il est normal de se sentir triste parfois. Prends le temps de respirer profondément et sois bienveillant envers toi-même.",
+            "Ta tristesse est valide. Essaie de faire quelque chose de doux pour toi aujourd'hui, même quelque chose de petit."
+        ],
+        "anxious": [
+            "L'anxiété peut être difficile, mais tu peux la gérer. Essaie de respirer lentement : inspire 4 secondes, retiens 4 secondes, expire 4 secondes.",
+            "Je sens ton inquiétude. Concentre-toi sur le moment présent et rappelle-toi que tu as déjà surmonté des défis auparavant.",
+            "L'anxiété est comme une vague - elle monte mais elle redescend toujours. Tu es plus fort que tu ne le penses."
+        ],
+        "angry": [
+            "Ta colère est compréhensible. Prends quelques respirations profondes et essaie de canaliser cette énergie de manière constructive.",
+            "Il est normal de ressentir de la colère. Essaie de faire de l'exercice ou d'écrire tes pensées pour libérer cette tension.",
+            "Je vois que tu es frustré. Prends un moment pour toi, cette émotion intense va s'apaiser."
+        ],
+        "happy": [
+            "C'est merveilleux de te voir si joyeux ! Profite pleinement de ce moment de bonheur, tu le mérites.",
+            "Ta joie est contagieuse ! Continue à cultiver cette belle énergie positive.",
+            "Quel plaisir de sentir ta bonne humeur ! Partage cette joie avec les personnes qui t'entourent."
+        ],
+        "excited": [
+            "Ton enthousiasme est formidable ! Canalise cette belle énergie dans quelque chose qui te passionne.",
+            "J'adore ton excitation ! Profite de cette motivation pour réaliser tes projets.",
+            "Cette énergie positive est magnifique ! Utilise-la pour créer quelque chose d'extraordinaire."
+        ],
+        "calm": [
+            "Cette sérénité que tu ressens est précieuse. Savoure ce moment de paix intérieure.",
+            "Ton calme est apaisant. Profite de cette tranquillité pour te reconnecter avec toi-même.",
+            "Cette paix que tu ressens est un cadeau. Garde cette sensation avec toi."
+        ],
+        "tired": [
+            "Je sens ta fatigue. Il est important d'écouter ton corps et de te reposer quand tu en as besoin.",
+            "Prends soin de toi. Un peu de repos et de douceur t'aideront à retrouver ton énergie.",
+            "Ta fatigue est un signal de ton corps. Accorde-toi du temps pour récupérer."
+        ],
+        "confused": [
+            "Il est normal de se sentir perdu parfois. Prends le temps de réfléchir, les réponses viendront.",
+            "La confusion fait partie du processus de compréhension. Sois patient avec toi-même.",
+            "Quand tout semble flou, concentre-toi sur une chose à la fois. La clarté reviendra."
+        ],
+        "proud": [
+            "Ta fierté est méritée ! Célèbre tes accomplissements, tu as travaillé dur pour cela.",
+            "C'est formidable de te voir si fier ! Continue sur cette lancée, tu es sur la bonne voie.",
+            "Tes réussites méritent d'être célébrées. Sois fier du chemin parcouru !"
+        ]
+    }
+    
+    # Get responses for the mood, with fallback to general supportive messages
+    responses = fallback_responses.get(mood.lower(), [
+        "Je suis là pour t'accompagner dans ce que tu ressens. Tes émotions sont importantes et valides.",
+        "Merci de partager tes sentiments avec moi. Tu n'es pas seul dans ce que tu traverses.",
+        "Chaque émotion a sa place et son importance. Je suis là pour t'écouter et te soutenir."
+    ])
+    
+    # Adjust response based on intensity
+    if intensity <= 3:
+        # Light intensity - gentle encouragement
+        base_response = responses[0] if len(responses) > 0 else responses[0]
+    elif intensity <= 6:
+        # Moderate intensity - more supportive
+        base_response = responses[1] if len(responses) > 1 else responses[0]
+    else:
+        # High intensity - strong support
+        base_response = responses[2] if len(responses) > 2 else responses[-1]
+    
+    # Add personalized touch if user provided a message
+    if message:
+        base_response += f" Je comprends que tu veuilles partager : '{message[:50]}{'...' if len(message) > 50 else ''}'."
+    
+    return base_response
+
 # API Routes
 @api_router.post("/users", response_model=User)
 async def create_user(user_data: UserCreate):
