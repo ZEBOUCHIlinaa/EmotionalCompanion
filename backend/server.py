@@ -291,19 +291,30 @@ async def get_ai_response(request: AIResponseRequest):
 
 @api_router.post("/chat", response_model=ChatMessage)
 async def chat_with_ai(request: ChatRequest):
-    """Continue conversation with AI companion"""
+    """Continue conversation with AI companion - with fallback for OpenAI quota issues"""
     try:
-        system_message = get_emotional_system_message(request.current_mood, request.mood_intensity)
-        
-        # Initialize chat with session ID for conversation continuity
-        chat = LlmChat(
-            api_key=OPENAI_API_KEY,
-            session_id=request.session_id,
-            system_message=system_message
-        ).with_model("openai", "gpt-4o").with_max_tokens(250)
-        
-        user_message = UserMessage(text=request.message)
-        ai_response_text = await chat.send_message(user_message)
+        # Try OpenAI integration first
+        if OPENAI_API_KEY:
+            try:
+                system_message = get_emotional_system_message(request.current_mood, request.mood_intensity)
+                
+                # Initialize chat with session ID for conversation continuity
+                chat = LlmChat(
+                    api_key=OPENAI_API_KEY,
+                    session_id=request.session_id,
+                    system_message=system_message
+                ).with_model("openai", "gpt-4o").with_max_tokens(250)
+                
+                user_message = UserMessage(text=request.message)
+                ai_response_text = await chat.send_message(user_message)
+                
+            except Exception as openai_error:
+                # Fallback to intelligent mock responses if OpenAI fails
+                logging.warning(f"OpenAI error in chat, using fallback: {str(openai_error)}")
+                ai_response_text = get_chat_fallback_response(request.message, request.current_mood, request.mood_intensity)
+        else:
+            # Use fallback if no API key
+            ai_response_text = get_chat_fallback_response(request.message, request.current_mood, request.mood_intensity)
         
         # Save chat message
         chat_message = ChatMessage(
