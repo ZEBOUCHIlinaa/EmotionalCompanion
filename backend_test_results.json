@@ -1,0 +1,83 @@
+{
+  "summary": {
+    "passed": 5,
+    "total": 8,
+    "success_rate": 0.625
+  },
+  "detailed_results": {
+    "Health Check": {
+      "success": true,
+      "details": "API is healthy and responding",
+      "response_data": null,
+      "timestamp": "2025-07-24T09:08:41.776314"
+    },
+    "User Creation": {
+      "success": true,
+      "details": "User created with UUID: 0ea805f1-fbfe-405d-8f42-d16fdb63b562",
+      "response_data": {
+        "id": "0ea805f1-fbfe-405d-8f42-d16fdb63b562",
+        "email": "marie.dubois@example.fr",
+        "name": "Marie Dubois",
+        "created_at": "2025-07-24T09:08:42.781501"
+      },
+      "timestamp": "2025-07-24T09:08:42.784906"
+    },
+    "User Retrieval": {
+      "success": true,
+      "details": "User retrieved successfully: Marie Dubois",
+      "response_data": {
+        "id": "0ea805f1-fbfe-405d-8f42-d16fdb63b562",
+        "email": "marie.dubois@example.fr",
+        "name": "Marie Dubois",
+        "created_at": "2025-07-24T09:08:42.781000"
+      },
+      "timestamp": "2025-07-24T09:08:43.796399"
+    },
+    "Mood Logging": {
+      "success": true,
+      "details": "Logged 9/9 mood entries successfully",
+      "response_data": null,
+      "timestamp": "2025-07-24T09:08:45.073376"
+    },
+    "Mood Retrieval": {
+      "success": true,
+      "details": "Retrieved 9 mood entries",
+      "response_data": [
+        {
+          "id": "c4544d13-1b8d-4191-8370-1bb5b527e258",
+          "user_id": "0ea805f1-fbfe-405d-8f42-d16fdb63b562",
+          "mood": "anxious",
+          "intensity": 10,
+          "timestamp": "2025-07-24T09:08:45.028000"
+        },
+        {
+          "id": "b6e8830d-7ede-4e0e-a67d-21c870a3e240",
+          "user_id": "0ea805f1-fbfe-405d-8f42-d16fdb63b562",
+          "mood": "anxious",
+          "intensity": 5,
+          "timestamp": "2025-07-24T09:08:45.020000"
+        }
+      ],
+      "timestamp": "2025-07-24T09:08:46.081747"
+    },
+    "AI Response Generation": {
+      "success": false,
+      "details": "Generated 0/3 AI responses successfully",
+      "response_data": null,
+      "timestamp": "2025-07-24T09:08:54.196342"
+    },
+    "Chat System": {
+      "success": false,
+      "details": "HTTP 500: {\"detail\":\"Error in chat\"}",
+      "response_data": null,
+      "timestamp": "2025-07-24T09:08:56.805168"
+    },
+    "Chat History": {
+      "success": false,
+      "details": "Expected at least 2 messages, got 0",
+      "response_data": null,
+      "timestamp": "2025-07-24T09:08:57.815014"
+    }
+  },
+  "test_timestamp": "2025-07-24T09:08:58.815358"
+}
