@@ -184,6 +184,30 @@ def get_fallback_emotional_response(mood: str, intensity: int, message: Optional
     
     return base_response
 
+def get_chat_fallback_response(message: str, mood: str, intensity: int):
+    """Generate intelligent fallback responses for chat when OpenAI is unavailable"""
+    
+    # Use the existing fallback response function as base
+    base_response = get_fallback_emotional_response(mood, intensity, message)
+    
+    # Add conversational elements for chat context
+    chat_starters = [
+        "Merci de partager cela avec moi. ",
+        "Je t'écoute. ",
+        "C'est important ce que tu me dis. ",
+        "Je comprends. "
+    ]
+    
+    # Select starter based on mood intensity
+    if intensity <= 3:
+        starter = chat_starters[0]
+    elif intensity <= 6:
+        starter = chat_starters[1]
+    else:
+        starter = chat_starters[2]
+    
+    return starter + base_response
+
 # API Routes
 @api_router.post("/users", response_model=User)
 async def create_user(user_data: UserCreate):
