@@ -10,6 +10,29 @@ from typing import List, Optional
 import uuid
 from datetime import datetime
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+from fastapi import Request
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+import traceback
+
+app = FastAPI()
+
+@app.post("/create-profile")
+async def create_profile(request: Request):
+    try:
+        data = await request.json()
+        print("📩 Données reçues du frontend :", data)
+
+        # Ici tu mets ton code habituel pour créer le profil
+        # Exemple :
+        # result = await save_to_db(data)
+        # print("✅ Profil sauvegardé :", result)
+
+        return JSONResponse(content={"message": "Profil créé avec succès"}, status_code=200)
+    except Exception as e:
+        print("❌ Erreur pendant /create-profile :", e)
+        traceback.print_exc()
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -21,7 +44,38 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+# début nouveau
+@app.post("/profile")
+async def create_profile(request: Request):
+    data = await request.json()
+    print("Données reçues pour le profil :", data)
 
+    # Réponse simulée
+    return {
+        "message": "Profil créé avec succès (mode test)",
+        "data": data
+    }
+
+@app.post("/login")
+async def login(request: Request):
+    data = await request.json()
+    print("Tentative de connexion :", data)
+
+    # Simulation de vérification
+    if data.get("email") == "test@example.com" and data.get("password") == "1234":
+        return {
+            "message": "Connexion réussie (mode test)",
+            "user": {
+                "id": "fake-user-id",
+                "name": "Utilisateur Test",
+                "email": data["email"]
+            }
+        }
+    else:
+        return {
+            "message": "Email ou mot de passe incorrect (mode test)"
+        }
+# fin nouveau
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
@@ -209,12 +263,24 @@ def get_chat_fallback_response(message: str, mood: str, intensity: int):
     return starter + base_response
 
 # API Routes
-@api_router.post("/users", response_model=User)
-async def create_user(user_data: UserCreate):
+#@api_router.post("/users", response_model=User)
+#async def create_user(user_data: UserCreate):
+#    """Create a new user"""
+#    user = User(**user_data.dict())
+#   await db.users.insert_one(user.dict())
+#    return user
+# API Routes
+
+@api_router.post("/create-profile", response_model=User)
+async def create_profile(user_data: UserCreate):
     """Create a new user"""
     user = User(**user_data.dict())
     await db.users.insert_one(user.dict())
     return user
+@api_router.post("/users", response_model=User)
+async def create_user_alias(user_data: UserCreate):
+    # Appeler directement la fonction existante
+    return await create_profile(user_data)
 
 @api_router.get("/users/{user_id}", response_model=User)
 async def get_user(user_id: str):
